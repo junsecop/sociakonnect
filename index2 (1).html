@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SociaKonnect | Elite Digital Concierge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── THEME VARIABLES ── */
+:root {
+  /* DARK THEME (Default) */
+  --bg: #050505;
+  --card-bg: #0c0c0c;
+  --surface: rgba(255, 255, 255, 0.03);
+  --text: #ffffff;
+  --text-muted: #888888;
+  --text-dim: #333333;
+  --border: rgba(255, 255, 255, 0.08);
+  --card-edge: rgba(255, 255, 255, 0.15);
+  --card-shadow: 0 -20px 60px rgba(0,0,0,0.9);
+  --invert-bg: #ffffff;
+  --invert-text: #050505;
+  --noise-op: 0.03;
+  --ambient: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 60%);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  /* LIGHT THEME */
+  --bg: #f2f2f4;
+  --card-bg: #ffffff;
+  --surface: rgba(0, 0, 0, 0.03);
+  --text: #0a0a0a;
+  --text-muted: #666666;
+  --text-dim: #cccccc;
+  --border: rgba(0, 0, 0, 0.08);
+  --card-edge: rgba(0, 0, 0, 0.15);
+  --card-shadow: 0 -20px 60px rgba(0,0,0,0.06);
+  --invert-bg: #0a0a0a;
+  --invert-text: #ffffff;
+  --noise-op: 0.06;
+  --ambient: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, transparent 70%);
+}
+
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body { 
+  font-family: 'Manrope', sans-serif; 
+  color: var(--text); 
+  background: var(--bg); 
+  overflow-x: hidden; 
+  line-height: 1.6; 
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+/* ── CINEMATIC TEXTURES ── */
+.noise {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: var(--noise-op);
+  background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+  transition: opacity 0.4s;
+}
+.ambient-light {
+  position: fixed; top: -50vh; left: -50vw; width: 200vw; height: 200vh;
+  background: var(--ambient); pointer-events: none; z-index: 0;
+  transition: background 0.4s;
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: fixed; top: 0; width: 100%; padding: 1.5rem 4vw; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); background: transparent;
+  transition: border-color 0.4s;
+}
+.logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); }
+.nav-actions { display: flex; align-items: center; gap: 1.5rem; }
+
+/* THEME TOGGLE */
+.theme-toggle {
+  background: transparent; border: 1px solid var(--border); cursor: pointer; 
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text); position: relative; overflow: hidden;
+  transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.theme-toggle:hover { border-color: var(--text); background: var(--surface); }
+.theme-toggle svg { 
+  position: absolute; width: 20px; height: 20px; fill: none; 
+  stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
+}
+[data-theme="dark"] .icon-sun { transform: scale(1) rotate(0deg); opacity: 1; }
+[data-theme="dark"] .icon-moon { transform: scale(0) rotate(-90deg); opacity: 0; }
+[data-theme="light"] .icon-sun { transform: scale(0) rotate(90deg); opacity: 0; }
+[data-theme="light"] .icon-moon { transform: scale(1) rotate(0deg); opacity: 1; }
+
+.nav-btn {
+  padding: 0.8rem 2rem; border-radius: 100px; font-weight: 600; font-size: 0.9rem;
+  background: var(--invert-bg); color: var(--invert-text); text-decoration: none;
+  transition: opacity 0.25s var(--ease);
+}
+.nav-btn:hover { opacity: 0.7; }
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 100vh; display: flex; flex-direction: column; 
+  justify-content: center; align-items: center; text-align: center; 
+  z-index: 10; padding: 6rem 1.5rem 2rem;
+}
+.hero-badge {
+  display: inline-block; padding: 0.5rem 1.2rem; border: 1px solid var(--border);
+  border-radius: 100px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 2rem;
+  opacity: 0; transform: translateY(20px); animation: fadeUp 1s var(--ease) 0.1s forwards;
+}
+.hero h1 {
+  font-size: clamp(2.5rem, 7vw, 6.5rem); font-weight: 800; line-height: 1.05; 
+  letter-spacing: -0.04em; margin-bottom: 1.5rem; max-width: 1000px;
+  opacity: 0; transform: translateY(40px); animation: fadeUp 1.2s var(--ease) 0.2s forwards;
+}
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.3rem); color: var(--text-muted); font-weight: 400; max-width: 700px;
+  opacity: 0; transform: translateY(30px); animation: fadeUp 1.2s var(--ease) 0.4s forwards;
+}
+
+/* ── APPLE iOS-STYLE CINEMATIC SCROLL INTRO ── */
+.cinematic-scroll {
+  height: 500vh; 
+  position: relative;
+  z-index: 5;
+}
+.cinematic-sticky {
+  position: sticky; top: 0; left: 0; width: 100%; height: 100vh; height: 100svh;
+  overflow: hidden; text-align: center; padding: 0 1.5rem;
+}
+.cine-text {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: clamp(1.8rem, 5vw, 4.5rem); font-weight: 600;
+  letter-spacing: -0.03em; color: var(--text-muted);
+  opacity: 0; width: 100%; will-change: transform, opacity;
+}
+.cine-brand-wrapper {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  opacity: 0; display: inline-block; white-space: nowrap; line-height: 1;
+  will-change: transform, opacity;
+}
+.cine-brand-text {
+  font-size: clamp(2.5rem, 8vw, 8.5rem); font-weight: 800; color: var(--text);
+  letter-spacing: -0.05em; display: inline-block; position: relative;
+}
+
+/* ── STACKED CARDS SERVICES (NEW CINEMATIC LAYOUT) ── */
+.services-stacked {
+  padding: 8rem 4vw 20vh 4vw;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+.section-header { 
+  font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; 
+  color: var(--text); margin-bottom: 6rem; display: flex; align-items: center; gap: 1rem; 
+}
+.section-header::before { content: ''; height: 2px; width: 40px; background: var(--text); }
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack-card {
+  /* Native CSS Sticky positioning acts like a physical deck */
+  position: sticky;
+  /* Each card offsets slightly lower than the last to create a folder-tab visual */
+  top: calc(12vh + (var(--card-index) * 2rem));
+  
+  min-height: 55vh;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--card-edge); /* Creates a sharp glass-edge on top */
+  border-radius: 32px;
+  box-shadow: var(--card-shadow);
+  
+  padding: 5rem 4rem;
+  margin-bottom: 50vh; /* Vast scrolling space before the next card slides up */
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.stack-card:last-child {
+  margin-bottom: 1;
+}
+
+.card-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.card-num {
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: monospace;
+  opacity: 0.4;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.1em;
+}
+.card-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+.card-title {
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+}
+.card-desc {
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* ── RESULTS ── */
+.results { padding: 10rem 4vw; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); position: relative; z-index: 2; transition: background 0.4s, border-color 0.4s; }
+.results-inner { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: center; }
+.results-text h2 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1rem; }
+.results-text p { color: var(--text-muted); font-size: 1.1rem; }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; }
+.metric { border-left: 2px solid var(--border); padding-left: 1.5rem; }
+.metric-num { font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 800; line-height: 1; letter-spacing: -0.05em; color: var(--text); margin-bottom: 0.5rem; }
+.metric-label { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
+
+/* ── CALCULATOR WIDGET ── */
+.calculator { padding: 10rem 4vw; max-width: 1000px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
+.calculator h2 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.03em; }
+.calculator > p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 4rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+.calc-widget { 
+  background: var(--card-bg); border: 1px solid var(--border); padding: 4rem 3rem; 
+  border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: left;
+  transition: background 0.4s, border-color 0.4s;
+}
+.calc-row { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem; }
+.slider-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 0.5rem;}
+.slider-label { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.slider-value { font-size: 2rem; font-weight: 800; color: var(--text); }
+
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; transition: background 0.4s; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; background: var(--invert-bg); margin-top: -11px; cursor: grab; transition: transform 0.2s, background 0.4s; }
+input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(0.9); }
+
+.calc-output { 
+  margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--border); 
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;
+}
+.output-block span { display: block; color: var(--text-muted); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.result-amount { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1; }
+.calc-disclaimer { font-size: 0.85rem; color: var(--text-muted); max-width: 300px; }
+
+/* ── CTA ── */
+.cta-section { padding: 8rem 1.5rem; text-align: center; position: relative; z-index: 2; }
+.cta-section h2 { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 3rem; line-height: 1.1; }
+.massive-btn {
+  display: inline-block; padding: 1.2rem 3rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  background: var(--invert-bg); color: var(--invert-text); border-radius: 100px; text-decoration: none; 
+  transition: transform 0.3s var(--ease), box-shadow 0.3s;
+}
+.massive-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(255,255,255,0.1); }
+[data-theme="light"] .massive-btn:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.2); }
+
+/* ── FOOTER ── */
+.footer-bottom {
+  padding: 4rem 4vw; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end;
+  background: var(--surface); transition: background 0.4s, border-color 0.4s; flex-wrap: wrap; gap: 2rem;
+}
+.footer-left { display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-copyright { font-size: 1rem; font-weight: 600; color: var(--text); }
+.footer-watermark { font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); }
+.footer-right { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); text-align: right; }
+
+/* ── ANIMATIONS ── */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.reveal.active { opacity: 1; transform: translateY(0); }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ── MOBILE RESPONSIVE TWEAKS ── */
+@media (max-width: 900px) {
+  .card-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .stack-card { 
+    padding: 3rem 2rem; 
+    min-height: auto; 
+    margin-bottom: 60vh; /* Keeps the dramatic scroll length on phones */
+  }
+  .card-icon { margin-bottom: 1.5rem; width: 48px; height: 48px; }
+  .results-inner { grid-template-columns: 1fr; gap: 3rem; }
+}
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .calc-widget { padding: 2.5rem 1.5rem; }
+  .calc-output { flex-direction: column; align-items: flex-start; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; text-align: left; }
+  .footer-right { text-align: left; }
+  .nav-btn { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="ambient-light"></div>
+
+<nav>
+  <a href="#" class="logo">SociaKonnect.</a>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Light/Dark Theme">
+      <svg class="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="#contact" class="nav-btn" data-magnetic>Executive Application</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-badge">Private Digital Management</div>
+  <h1>Turn Your Audience<br>Into Real Income.</h1>
+  <p>We handle the strategy, content, and community management so you can focus on building your business. No fluff, just measurable growth</p>
+</header>
+
+<section class="cinematic-scroll" id="cineScroll">
+  <div class="cinematic-sticky">
+    <h2 class="cine-text" id="cineText1">We don't just manage accounts.</h2>
+    <h2 class="cine-text" id="cineText2">We architect digital empires.</h2>
+    <h2 class="cine-text" id="cineText3">Introducing</h2>
+    
+    <div class="cine-brand-wrapper" id="cineBrandWrap">
+      <span class="cine-brand-text">SociaKonnect.</span>
+    </div>
+  </div>
+</section>
+
+<section class="services-stacked">
+  <div class="section-header reveal">The Executive Advantage</div>
+  
+  <div class="cards-container">
+    
+    <div class="stack-card" style="--card-index: 0;">
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="card-num">01</span>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <h3 class="card-title">Bespoke<br>Digital Estates</h3>
+        </div>
+        <div class="card-right">
+          <p class="card-desc">Social media shouldn't be your only footprint. We design, engineer, and manage custom, high-end websites that act as the flawless centerpieces of your personal brand.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-card" style="--card-index: 1;">
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="card-num">02</span>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <h3 class="card-title">Concierge Inbox<br>Management</h3>
+        </div>
+        <div class="card-right">
+          <p class="card-desc">For the relentlessly busy. We act as your executive filter, managing your messages and inquiries so you only spend time on legitimate, high-impact business opportunities.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-card" style="--card-index: 2;">
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="card-num">03</span>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3 class="card-title">Elite Brand<br>Security</h3>
+        </div>
+        <div class="card-right">
+          <p class="card-desc">We safeguard your most valuable asset. From locking down your accounts against breaches to proactive reputation monitoring, we keep your digital presence ironclad and secure.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-card" style="--card-index: 3;">
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="card-num">04</span>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <h3 class="card-title">Authority<br>Syndication</h3>
+        </div>
+        <div class="card-right">
+          <p class="card-desc">We secure your legacy. By orchestrating strategic placements in top-tier publications and creating expert-driven content, we cement your status as the undisputed leader in your industry.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-card" style="--card-index: 4;">
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="card-num">05</span>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <h3 class="card-title">Precision<br>Growth</h3>
+        </div>
+        <div class="card-right">
+          <p class="card-desc">We turn attention into equity. Using zero-waste targeted advertising and strategic networking, we systematically attract your exact ideal clients and high-level brand partners.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- Insert this immediately after your cards section -->
+
+<!-- Google Fonts Import for Lora -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+
+<style>
+  /* --- Scroll-Tied Cinematic Summary (Lora Edition) --- */
+  :root {
+    --bg-pure: #050505;
+    --text-main: #ffffff;
+    --accent-glow: rgba(255, 255, 255, 0.08); /* Subtle white glow */
+    --font-serif: 'Lora', serif; /* Updated to Lora */
+    --font-sans: 'Helvetica Neue', Helvetica, sans-serif;
+  }
+
+  /* Increased height to 1000vh to fit 10 words comfortably */
+  .scroll-cinema-wrap {
+    position: relative;
+    width: 100%;
+    height: 1000vh; 
+    background-color: var(--bg-pure);
+  }
+
+  /* The sticky container stays locked on screen while scrolling the wrapper */
+  .sticky-cinema {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Film Grain Overlay */
+  .film-grain {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.04;
+    background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+  }
+
+  /* Dynamic Glowing Aura */
+  .cinematic-aura {
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    filter: blur(60px);
+    z-index: 1;
+    will-change: transform, opacity;
+  }
+
+  /* Text Sequence Container */
+  .sequence-container {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Flash Words */
+  .scroll-word {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.2);
+    font-family: var(--font-sans);
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+    text-transform: uppercase;
+    opacity: 0; /* Default hidden, controlled by JS */
+    filter: blur(20px);
+    white-space: nowrap;
+    will-change: transform, opacity, filter;
+  }
+
+  /* Final Reveal Statement */
+  .final-reveal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% + 40px));
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    filter: blur(10px);
+    will-change: transform, opacity, filter;
+  }
+
+  .final-sub {
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    font-size: 0.9rem;
+    color: #888888; /* Clean mid-gray */
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .final-main {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .final-main em {
+    font-style: italic;
+    color: var(--text-main); /* Pure white, relying on italics for emphasis */
+  }
+</style>
+
+<section class="scroll-cinema-wrap" id="scrollCinema">
+  <div class="sticky-cinema">
+    <div class="film-grain"></div>
+    <div class="cinematic-aura"></div>
+    
+    <div class="sequence-container">
+      <!-- The 10 Services mapped to short, punchy cinema text -->
+      <div class="scroll-word">Professional Websites.</div>
+      <div class="scroll-word">Inbox Management.</div>
+      <div class="scroll-word">Premium Content.</div>
+      <div class="scroll-word">Long-Term Strategy.</div>
+      <div class="scroll-word">Brand Protection.</div>
+      <div class="scroll-word">Clear Analytics.</div>
+      <div class="scroll-word">Network Expansion.</div>
+      <div class="scroll-word">Digital PR.</div>
+      <div class="scroll-word">Precision Ads.</div>
+      <div class="scroll-word">Community Building.</div>
+      
+      <!-- The Final Slogan -->
+      <div class="final-reveal">
+        <span class="final-sub">The Result</span>
+        
+        <h2 class="final-main">Recognized Digital Dominance.</h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrap = document.getElementById('scrollCinema');
+    const words = wrap.querySelectorAll('.scroll-word');
+    const finalReveal = wrap.querySelector('.final-reveal');
+    const aura = wrap.querySelector('.cinematic-aura');
+
+    function updateScrollAnimation() {
+      const rect = wrap.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Progress goes from 0 (top of section hits top of screen) to 1 (bottom hits bottom)
+      const rawProgress = -rect.top / (rect.height - windowHeight);
+      const progress = Math.max(0, Math.min(1, rawProgress));
+
+      // Helper function for a smooth fade curve (0 to 1 back to 0)
+      const getCurve = (p, start, end) => {
+        if (p < start || p > end) return 0;
+        const local = (p - start) / (end - start);
+        return Math.sin(local * Math.PI); 
+      };
+
+      // Helper function for a straight line value (0 to 1)
+      const getLinear = (p, start, end) => {
+        if (p < start) return 0;
+        if (p > end) return 1;
+        return (p - start) / (end - start);
+      };
+
+      // The first 85% of the scroll space is divided equally among the 10 words
+      const wordsScrollSpace = 0.85; 
+      const segmentSize = wordsScrollSpace / words.length;
+
+      // Loop through all words dynamically
+      words.forEach((word, index) => {
+        const start = index * segmentSize;
+        const end = start + segmentSize;
+
+        let c = getCurve(progress, start, end);
+        let l = getLinear(progress, start, end);
+
+        // Apply Opacity, Blur, and Scale
+        word.style.opacity = c;
+        word.style.filter = `blur(${(1 - c) * 20}px)`;
+        word.style.transform = `translate(-50%, -50%) scale(${1.2 - l * 0.3})`;
+      });
+
+      // The last 15% (0.85 to 1.0) is for the Final Reveal
+      let lFinal = getLinear(progress, 0.85, 0.98);
+      finalReveal.style.opacity = lFinal;
+      finalReveal.style.filter = `blur(${(1 - lFinal) * 10}px)`;
+      finalReveal.style.transform = `translate(-50%, calc(-50% + ${(1 - lFinal) * 40}px))`;
+
+      // Aura expands and brightens smoothly through the whole scroll
+      aura.style.opacity = progress * 0.8;
+      aura.style.transform = `translate(-50%, -50%) scale(${0.5 + (progress * 0.8)})`;
+    }
+
+    // RequestAnimationFrame keeps the scroll buttery smooth
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(updateScrollAnimation);
+    });
+    
+    // Call once to set initial positions on load
+    updateScrollAnimation();
+  });
+</script>
+
+<section class="results">
+  <div class="results-inner">
+    <div class="results-text reveal">
+      <h2>Elite reputation <br>Professionally controlled.</h2>
+      <p>For individuals of high net worth and public influence, social media is a liability if mismanaged. We turn it into a perfectly calibrated asset.</p>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric reveal" style="transition-delay: 0.1s;">
+        <div class="metric-num">100%</div>
+        <div class="metric-label">Client Confidentiality</div>
+      </div>
+      <div class="metric reveal" style="transition-delay: 0.2s;">
+        <div class="metric-num">0</div>
+        <div class="metric-label">Seconds Wasted on Spam</div>
+      </div>
+      <div class="metric reveal" style="transition-delay: 0.3s;">
+        <div class="metric-num">24/7</div>
+        <div class="metric-label">Concierge Monitoring</div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<section class="calculator reveal">
+  <h2>Calculate Your Potential</h2>
+  <p>Most brands leave massive value untapped. Use the slider below to estimate the monthly revenue potential of your existing audience when optimized by our team.</p>
+ 
+  <div class="calc-widget">
+    <div class="calc-row">
+      <div class="slider-header">
+        <span class="slider-label">Current Monthly Views</span>
+        <span class="slider-value" id="viewDisplay">500K</span>
+      </div>
+      <input type="range" id="viewSlider" min="10000" max="10000000" step="10000" value="500000">
+    </div>
+ 
+    <!-- Currency switcher -->
+    <div class="currency-bar" id="currencyBar">
+      <button class="currency-btn active" data-code="USD" data-symbol="$"  data-rate="1">USD $</button>
+      <button class="currency-btn" data-code="EUR" data-symbol="€"  data-rate="0.92">EUR €</button>
+      <button class="currency-btn" data-code="GBP" data-symbol="£"  data-rate="0.79">GBP £</button>
+      <button class="currency-btn" data-code="INR" data-symbol="₹"  data-rate="83.5">INR ₹</button>
+      <button class="currency-btn" data-code="JPY" data-symbol="¥"  data-rate="151">JPY ¥</button>
+      <button class="currency-btn" data-code="AUD" data-symbol="A$" data-rate="1.53">AUD A$</button>
+      <button class="currency-btn" data-code="CAD" data-symbol="C$" data-rate="1.36">CAD C$</button>
+      <button class="currency-btn" data-code="BRL" data-symbol="R$" data-rate="4.97">BRL R$</button>
+    </div>
+ 
+    <!-- Output cards -->
+    <div class="calc-output">
+      <div class="output-block">
+        <span>Estimated Monthly Revenue</span>
+        <div class="result-amount" id="revenueDisplay">$12,500</div>
+      </div>
+      <div class="output-block">
+        <span>Estimated Annual Revenue</span>
+        <div class="result-amount" id="annualDisplay">$150,000</div>
+      </div>
+    </div>
+ 
+    <!-- Graph -->
+    <div class="graph-container">
+      <canvas id="revenueChart" role="img" aria-label="Line chart showing estimated revenue as views increase from 10K to 10M"></canvas>
+    </div>
+ 
+    <p class="calc-disclaimer">Based on industry averages of $5 RPM optimized with our proprietary conversion frameworks. Currency rates are approximate. Actual results vary by niche.</p>
+  </div>
+</section>
+
+<style>
+.calc-widget {
+  /* add your existing widget styles here */
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.slider-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.slider-value {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Slider track & thumb */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #000;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #000;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #000;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #000;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #000;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: #000;
+  border-radius: 2px;
+}
+
+/* Currency bar */
+.currency-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 1.25rem 0;
+}
+
+.currency-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.currency-btn:hover {
+  border-color: #999;
+  color: #333;
+}
+
+.currency-btn.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* Output cards */
+.calc-output {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 1.5rem;
+}
+
+.output-block {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.output-block span {
+  font-size: 12px;
+  color: #888;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.result-amount {
+  font-size: 26px;
+  font-weight: 500;
+  color: #000;
+}
+
+/* Graph */
+.graph-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  margin-bottom: 1rem;
+}
+
+.calc-disclaimer {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .currency-btn {
+    border-color: #444;
+    color: #aaa;
+  }
+  .currency-btn:hover {
+    border-color: #888;
+    color: #eee;
+  }
+  .currency-btn.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+  .output-block {
+    background: #1a1a1a;
+  }
+  .output-block span {
+    color: #666;
+  }
+  .result-amount {
+    color: #fff;
+  }
+  .slider-label {
+    color: #aaa;
+  }
+  input[type="range"] {
+    background: #fff;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 0 0 0 1px #fff;
+  }
+  input[type="range"]::-moz-range-thumb {
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 0 0 0 1px #fff;
+  }
+  input[type="range"]::-moz-range-track {
+    background: #fff;
+  }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function () {
+  const slider       = document.getElementById('viewSlider');
+  const viewDisplay  = document.getElementById('viewDisplay');
+  const revenueDisplay = document.getElementById('revenueDisplay');
+  const annualDisplay  = document.getElementById('annualDisplay');
+ 
+  const BASE_RPM    = 5;
+  const MULTIPLIER  = 5;
+ 
+  let currentRate   = 1;
+  let currentSymbol = '$';
+  let currentCode   = 'USD';
+  let chart;
+ 
+  /* ── helpers ── */
+  function calcUsdRevenue(views) {
+    return (views / 1000) * BASE_RPM * MULTIPLIER;
+  }
+ 
+  function fmtViews(v) {
+    if (v >= 1000000) return (v / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (v >= 1000)    return Math.round(v / 1000) + 'K';
+    return String(v);
+  }
+ 
+  function fmtMoney(usdAmount) {
+    const val = Math.round(usdAmount * currentRate);
+    return currentSymbol + new Intl.NumberFormat('en-US').format(val);
+  }
+ 
+  /* ── chart data ── */
+  function buildChartData() {
+    const steps = 20, min = 10000, max = 10000000;
+    const labels = [], data = [];
+    for (let i = 0; i <= steps; i++) {
+      const v = Math.round(min + (max - min) * (i / steps));
+      labels.push(fmtViews(v));
+      data.push(Math.round(calcUsdRevenue(v) * currentRate));
+    }
+    return { labels, data };
+  }
+ 
+  function isDark() {
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+ 
+  /* ── init chart ── */
+  function initChart() {
+    const { labels, data } = buildChartData();
+    const dark      = isDark();
+    const lineColor = dark ? '#ffffff' : '#000000';
+    const fillColor = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+    const gridColor = dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+    const textColor = dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)';
+ 
+    chart = new Chart(document.getElementById('revenueChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: lineColor,
+          borderWidth: 1.5,
+          backgroundColor: fillColor,
+          fill: true,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: lineColor,
+          tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ' ' + fmtMoney(ctx.parsed.y / currentRate)
+            },
+            backgroundColor: dark ? '#1a1a1a' : '#fff',
+            borderColor: dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+            borderWidth: 0.5,
+            titleColor: dark ? '#fff' : '#000',
+            bodyColor:  dark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+            padding: 10,
+            cornerRadius: 6
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: textColor, font: { size: 11 }, maxTicksLimit: 6, maxRotation: 0 },
+            grid:  { color: gridColor, lineWidth: 0.5 },
+            border: { color: 'transparent' }
+          },
+          y: {
+            ticks: {
+              color: textColor,
+              font: { size: 11 },
+              maxTicksLimit: 5,
+              callback: v => {
+                if (v >= 1000000) return currentSymbol + (v / 1000000).toFixed(1) + 'M';
+                if (v >= 1000)    return currentSymbol + Math.round(v / 1000) + 'K';
+                return currentSymbol + v;
+              }
+            },
+            grid:  { color: gridColor, lineWidth: 0.5 },
+            border: { color: 'transparent' }
+          }
+        }
+      }
+    });
+  }
+ 
+  /* ── update marker dot on graph ── */
+  function updateMarker() {
+    if (!chart) return;
+    const views    = parseInt(slider.value);
+    const step     = Math.round((views - 10000) / (10000000 - 10000) * 20);
+    chart.data.datasets[0].pointRadius = chart.data.labels.map((_, i) => i === step ? 5 : 0);
+    chart.update('none');
+  }
+ 
+  /* ── update text displays ── */
+  function updateDisplay() {
+    const views  = parseInt(slider.value);
+    const usdRev = calcUsdRevenue(views);
+    viewDisplay.textContent   = fmtViews(views);
+    revenueDisplay.textContent = fmtMoney(usdRev);
+    annualDisplay.textContent  = fmtMoney(usdRev * 12);
+    updateMarker();
+  }
+ 
+  /* ── update graph when currency changes ── */
+  function updateChartCurrency() {
+    if (!chart) return;
+    chart.data.datasets[0].data = buildChartData().data;
+    chart.options.scales.y.ticks.callback = v => {
+      if (v >= 1000000) return currentSymbol + (v / 1000000).toFixed(1) + 'M';
+      if (v >= 1000)    return currentSymbol + Math.round(v / 1000) + 'K';
+      return currentSymbol + v;
+    };
+    chart.update();
+    updateMarker();
+  }
+ 
+  /* ── events ── */
+  document.getElementById('currencyBar').addEventListener('click', function (e) {
+    const btn = e.target.closest('.currency-btn');
+    if (!btn) return;
+    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentRate   = parseFloat(btn.dataset.rate);
+    currentSymbol = btn.dataset.symbol;
+    currentCode   = btn.dataset.code;
+    updateDisplay();
+    updateChartCurrency();
+  });
+ 
+  slider.addEventListener('input', updateDisplay);
+ 
+  /* ── init ── */
+  initChart();
+  updateDisplay();
+})();
+</script>
+
+<section class="cta-section reveal" id="contact">
+  <h2>Your digital legacy,<br>secured.</h2>
+  <a href="mailto:concierge@sociakonnect.com" class="massive-btn" data-magnetic>Request Private Consultation</a>
+</section>
+
+<footer class="footer-bottom">
+  <div class="footer-left">
+    <div class="footer-copyright">© 2026 SociaKonnect. All rights reserved.</div>
+    <div class="footer-watermark">A Bryven Groups of Company Initiative</div>
+  </div>
+  <div class="footer-right">
+    Exclusive Digital Management & Concierge
+  </div>
+</footer>
+
+<script>
+// ── THEME TOGGLE LOGIC ──
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+
+const savedTheme = localStorage.getItem('theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+if (savedTheme) {
+    root.setAttribute('data-theme', savedTheme);
+} else if (!prefersDark) {
+    root.setAttribute('data-theme', 'light');
+}
+
+themeToggle.addEventListener('click', () => {
+    let currentTheme = root.getAttribute('data-theme');
+    let newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    if (!currentTheme) newTheme = 'light';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+});
+
+// ── CINEMATIC SCROLL ANIMATION (Apple Trailer Style) ──
+const cineScroll = document.getElementById('cineScroll');
+const t1 = document.getElementById('cineText1');
+const t2 = document.getElementById('cineText2');
+const t3 = document.getElementById('cineText3');
+const wrapper = document.getElementById('cineBrandWrap');
+
+let isTicking = false;
+
+function handleScrollUpdates() {
+    if (cineScroll) {
+        const rect = cineScroll.getBoundingClientRect();
+        const start = rect.top;
+        const scrollableHeight = rect.height - window.innerHeight;
+        
+        let progress = -start / scrollableHeight;
+        progress = Math.max(0, Math.min(1, progress));
+
+        if(progress > 0 && progress < 0.20) {
+            let p = progress / 0.20;
+            t1.style.opacity = Math.sin(p * Math.PI);
+            t1.style.transform = `translate(-50%, calc(-50% + ${(1-p)*40}px))`;
+        } else t1.style.opacity = 0;
+
+        if(progress >= 0.20 && progress < 0.40) {
+            let p = (progress - 0.20) / 0.20;
+            t2.style.opacity = Math.sin(p * Math.PI);
+            t2.style.transform = `translate(-50%, calc(-50% + ${(1-p)*40}px))`;
+        } else t2.style.opacity = 0;
+
+        if(progress >= 0.40 && progress < 0.60) {
+            let p = (progress - 0.40) / 0.20;
+            t3.style.opacity = Math.sin(p * Math.PI);
+            t3.style.transform = `translate(-50%, calc(-50% + ${(1-p)*40}px))`;
+        } else t3.style.opacity = 0;
+
+        if(progress >= 0.60) {
+            let pText = Math.min(1, (progress - 0.60) / 0.20); 
+            wrapper.style.opacity = pText;
+            wrapper.style.transform = `translate(-50%, -50%) scale(${0.9 + (pText * 0.1)})`;
+        } else {
+            wrapper.style.opacity = 0;
+        }
+    }
+    isTicking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (!isTicking) {
+        window.requestAnimationFrame(handleScrollUpdates);
+        isTicking = true;
+    }
+});
+
+// ── MAGNETIC BUTTON EFFECT ──
+// ── HOVER SPOTLIGHT EFFECT ──
+const magneticElements = document.querySelectorAll('[data-magnetic]');
+magneticElements.forEach((el) => {
+  el.style.position = 'relative';
+  el.style.overflow = 'hidden';
+
+  const spotlight = document.createElement('span');
+  spotlight.style.cssText = `
+    position: absolute; inset: 0; pointer-events: none;
+    border-radius: inherit; opacity: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12) 0%, transparent 65%);
+    transition: opacity 0.35s ease;
+  `;
+  el.appendChild(spotlight);
+
+  el.addEventListener('mouseenter', () => {
+    spotlight.style.opacity = '1';
+  });
+
+  el.addEventListener('mousemove', (e) => {
+    const r = el.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1) + '%';
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1) + '%';
+    el.style.setProperty('--mx', x);
+    el.style.setProperty('--my', y);
+  });
+
+  el.addEventListener('mouseleave', () => {
+    spotlight.style.opacity = '0';
+  });
+});
+
+// ── SCROLL REVEAL ANIMATIONS ──
+const revealElements = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.15 });
+
+revealElements.forEach(el => revealObserver.observe(el));
+
+// ── CALCULATOR LOGIC ──
+const viewSlider = document.getElementById('viewSlider');
+const viewDisplay = document.getElementById('viewDisplay');
+const revenueDisplay = document.getElementById('revenueDisplay');
+
+function updateCalculator() {
+    const views = parseInt(viewSlider.value);
+    
+    let formattedViews = views >= 1000000 
+        ? (views / 1000000).toFixed(1).replace(/\.0$/, '') + 'M' 
+        : new Intl.NumberFormat('en-US').format(views);
+        
+    viewDisplay.innerText = formattedViews;
+
+    const baseRpm = 5; 
+    const multiplier = 5; 
+    const revenue = (views / 1000) * baseRpm * multiplier;
+
+    revenueDisplay.innerText = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    }).format(revenue);
+}
+
+viewSlider.addEventListener('input', updateCalculator);
+updateCalculator(); // Initialize layout
+handleScrollUpdates(); // Initialize scroll positions
+</script>
+</body>
+</html>
